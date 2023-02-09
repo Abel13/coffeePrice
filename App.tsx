@@ -18,15 +18,16 @@ export default function App() {
 
   const [differenceColor, setDifferenceColor] = useState("#fff");
   const [price, setPrice] = useState(0);
-  const diferencePrice = useMemo(() => {
+  const differencePrice = useMemo(() => {
     if (price === 0) return 0;
     const referencePrice = currentDollarPrice * currentArabicaPrice;
     return price - referencePrice;
   }, [price, currentDollarPrice, currentArabicaPrice]);
 
-  const diferencePercent = useMemo(() => {
-    return 0;
-  }, []);
+  const differencePercent = useMemo(() => {
+    const referencePrice = currentDollarPrice * currentArabicaPrice;
+    return ((differencePrice / referencePrice) * 100).toFixed(2);
+  }, [differencePrice, currentArabicaPrice, currentDollarPrice]);
 
   const schema = Yup.object().shape({
     price: Yup.number().min(0, "Valor iválido").required("Campo obrigatório"),
@@ -44,6 +45,7 @@ export default function App() {
 
   useEffect(() => {
     const referencePrice = currentDollarPrice * currentArabicaPrice;
+
     if (price === 0) setDifferenceColor("#fff");
     else if (price <= referencePrice + referencePrice * 0.12001)
       setDifferenceColor("#a15158");
@@ -98,10 +100,10 @@ export default function App() {
             }}
           >
             <Text bold>Café Arábica KC</Text>
-            <Text>{getCurrencyValue(item.arabicaPrice)}</Text>
+            <Text>{getCurrencyValue(item.arabicaPrice, "USD")}</Text>
           </View>
           <View style={{ flex: 1, marginLeft: 16 }}>
-            <Text bold>Dollar</Text>
+            <Text bold>Dolar</Text>
             <Text>{getCurrencyValue(item.dollarPrice)}</Text>
           </View>
         </View>
@@ -114,7 +116,7 @@ export default function App() {
           }}
         >
           <View style={{ margin: 5 }} />
-          <Text>Preço de referência</Text>
+          <Text>Preço de Referência</Text>
           <Text>{getCurrencyValue(mainPrice)}</Text>
           <View style={{ marginTop: 5 }}>
             <Text>Variação de preço</Text>
@@ -130,7 +132,7 @@ export default function App() {
               padding: 2,
             }}
           >
-            <Text bold>Diferencial</Text>
+            <Text bold>Diferencial (Bebida Dura)</Text>
           </View>
 
           <View
@@ -186,7 +188,7 @@ export default function App() {
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <View style={{ alignItems: "center" }}>
-          <Text bold>CONTROLE DE PREÇOS CAFÉ ARÁBICA</Text>
+          <Text bold>CONTROLE DE PREÇOS</Text>
         </View>
         <View style={{ margin: 10 }} />
         <View style={{ flexDirection: "row" }}>
@@ -194,12 +196,12 @@ export default function App() {
           <Text>{dayjs(currentDate).format("DD/MM/YYYY")}</Text>
         </View>
         <View style={{ flexDirection: "row" }}>
-          <Text bold>Dollar: </Text>
+          <Text bold>Dolar: </Text>
           <Text>{getCurrencyValue(currentDollarPrice)}</Text>
         </View>
         <View style={{ flexDirection: "row" }}>
-          <Text bold>Café Arábica: </Text>
-          <Text>{getCurrencyValue(currentArabicaPrice)}</Text>
+          <Text bold>Café Arábica KC: </Text>
+          <Text>{getCurrencyValue(currentArabicaPrice, "USD")}</Text>
         </View>
         <View style={{ margin: 5 }} />
 
@@ -242,13 +244,13 @@ export default function App() {
               }}
             >
               <Text bold>Diferença R$</Text>
-              <Text>{getCurrencyValue(diferencePrice)}</Text>
+              <Text>{getCurrencyValue(differencePrice)}</Text>
             </View>
             <View
               style={{ flex: 1, alignItems: "flex-end", paddingVertical: 8 }}
             >
               <Text bold>Diferença %</Text>
-              <Text>{`${diferencePercent}%`}</Text>
+              <Text>{`${differencePercent}%`}</Text>
             </View>
           </View>
         </View>

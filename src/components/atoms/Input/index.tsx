@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingLeft: 16,
     paddingTop: 4,
-    color: "#a13d",
+    color: "#DF7474",
   },
 });
 

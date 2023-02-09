@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   bold: { fontWeight: "bold" },
-  danger: { color: "#AA0117" },
+  danger: { color: "#DF7474" },
 });
 
 export default CustomText;
