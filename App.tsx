@@ -1,7 +1,14 @@
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
-import { FlatList, StyleSheet, View } from "react-native";
+import {
+  Alert,
+  FlatList,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Input, Text } from "./src/components/atoms";
 import { getCurrencyValue } from "./src/services/currency";
@@ -12,10 +19,18 @@ import { useForm } from "react-hook-form";
 
 export default function App() {
   const {
-    state: { currentArabicaPrice, currentDollarPrice, currentDate, data },
+    state: {
+      currentArabicaPrice,
+      currentDollarPrice,
+      currentDate,
+      data,
+      dataLoaded,
+    },
     getData,
+    resetCurrentData,
   } = useMainStore((store) => store);
 
+  const [loading, setLoading] = useState(false);
   const [differenceColor, setDifferenceColor] = useState("#fff");
   const [price, setPrice] = useState(0);
   const differencePrice = useMemo(() => {
@@ -39,9 +54,24 @@ export default function App() {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      await getData();
+    } catch (error) {
+      console.log("🚀 ~ file: App.tsx:55 ~ fetchData ~ error", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    getData();
+    resetCurrentData();
   }, []);
+
+  useEffect(() => {
+    if (!dataLoaded) fetchData();
+  }, [dataLoaded]);
 
   useEffect(() => {
     const referencePrice = currentDollarPrice * currentArabicaPrice;
@@ -79,7 +109,7 @@ export default function App() {
           }}
         >
           <Text>Data: </Text>
-          <Text>{item.date}</Text>
+          <Text>{dayjs(item.date).format("DD/MM/YYYY HH:mm")}</Text>
         </View>
 
         <View
@@ -116,7 +146,7 @@ export default function App() {
           }}
         >
           <View style={{ margin: 5 }} />
-          <Text>Preço de Referência</Text>
+          <Text>Preço do café R$</Text>
           <Text>{getCurrencyValue(mainPrice)}</Text>
           <View style={{ marginTop: 5 }}>
             <Text>Variação de preço</Text>
@@ -187,93 +217,98 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <View style={{ alignItems: "center" }}>
-          <Text bold>CONTROLE DE PREÇOS</Text>
-        </View>
-        <View style={{ margin: 10 }} />
-        <View style={{ flexDirection: "row" }}>
-          <Text bold>Data: </Text>
-          <Text>{dayjs(currentDate).format("DD/MM/YYYY")}</Text>
-        </View>
-        <View style={{ flexDirection: "row" }}>
-          <Text bold>Dolar: </Text>
-          <Text>{getCurrencyValue(currentDollarPrice)}</Text>
-        </View>
-        <View style={{ flexDirection: "row" }}>
-          <Text bold>Café Arábica KC: </Text>
-          <Text>{getCurrencyValue(currentArabicaPrice, "USD")}</Text>
-        </View>
-        <View style={{ margin: 5 }} />
-
-        <View
-          style={{
-            backgroundColor: "#514171",
-            borderBottomColor: differenceColor,
-            borderBottomWidth: 5,
-            borderRadius: 8,
-          }}
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={loading} onRefresh={getData} />
+          }
         >
-          <View style={{ padding: 8 }}>
-            <Text bold>Cotação atual</Text>
-
-            <Input
-              type="currency"
-              control={control}
-              name={"price"}
-              error={errors.price?.message}
-              placeholder="Preço oferecido"
-              onEndEditing={handleSubmit(onSubmit)}
-            />
+          <View style={{ alignItems: "center" }}>
+            <Text bold>CONTROLE DE PREÇOS</Text>
           </View>
+          <View style={{ margin: 10 }} />
+          <View style={{ flexDirection: "row", paddingHorizontal: 16 }}>
+            <Text bold>Data: </Text>
+            <Text>{dayjs(currentDate).format("DD/MM/YYYY")}</Text>
+          </View>
+          <View style={{ flexDirection: "row", paddingHorizontal: 16 }}>
+            <Text bold>Dolar: </Text>
+            <Text>{getCurrencyValue(currentDollarPrice)}</Text>
+          </View>
+          <View style={{ flexDirection: "row", paddingHorizontal: 16 }}>
+            <Text bold>Café Arábica KC: </Text>
+            <Text>{getCurrencyValue(currentArabicaPrice, "USD")}</Text>
+          </View>
+          <View style={{ margin: 5 }} />
+
           <View
             style={{
-              borderTopColor: "#FFF",
-              borderTopWidth: 1,
-              marginTop: 10,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              paddingHorizontal: 8,
+              backgroundColor: "#514171",
+              borderBottomColor: differenceColor,
+              borderBottomWidth: 5,
+              borderRadius: 8,
+              marginHorizontal: 16,
             }}
           >
+            <View style={{ padding: 8 }}>
+              <Text bold>Cotação atual</Text>
+
+              <Input
+                type="currency"
+                control={control}
+                name={"price"}
+                error={errors.price?.message}
+                placeholder="Preço oferecido"
+                onEndEditing={handleSubmit(onSubmit)}
+              />
+            </View>
             <View
               style={{
-                borderRightColor: "#FFF",
-                borderRightWidth: 1,
-                flex: 1,
-                paddingVertical: 8,
+                borderTopColor: "#FFF",
+                borderTopWidth: 1,
+                marginTop: 10,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                paddingHorizontal: 8,
               }}
             >
-              <Text bold>Diferença R$</Text>
-              <Text>{getCurrencyValue(differencePrice)}</Text>
-            </View>
-            <View
-              style={{ flex: 1, alignItems: "flex-end", paddingVertical: 8 }}
-            >
-              <Text bold>Diferença %</Text>
-              <Text>{`${differencePercent}%`}</Text>
+              <View
+                style={{
+                  borderRightColor: "#FFF",
+                  borderRightWidth: 1,
+                  flex: 1,
+                  paddingVertical: 8,
+                }}
+              >
+                <Text bold>Diferença R$</Text>
+                <Text>{getCurrencyValue(differencePrice)}</Text>
+              </View>
+              <View
+                style={{ flex: 1, alignItems: "flex-end", paddingVertical: 8 }}
+              >
+                <Text bold>Diferença %</Text>
+                <Text>{`${differencePercent}%`}</Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        <View style={{ margin: 10 }} />
-        <View>
-          <FlatList
-            data={data.reverse()}
-            horizontal
-            keyExtractor={(item: IPrice) => item.date}
-            renderItem={itemRender}
-          />
-        </View>
-
-        <StatusBar style="auto" />
+          <View style={{ margin: 10 }} />
+          <View>
+            <FlatList
+              data={data}
+              horizontal
+              keyExtractor={(item: IPrice) => item.date}
+              renderItem={itemRender}
+            />
+          </View>
+        </ScrollView>
       </SafeAreaView>
+      <StatusBar style="auto" />
     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
     backgroundColor: "#83746E",
     flex: 1,
   },
