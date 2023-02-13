@@ -53,10 +53,15 @@ export const useMainStore = create<IMainStore>()(
             dayjs(d.date).format("YYYY/MM/DD") === dayjs().format("YYYY/MM/DD")
           );
         });
+        console.log(
+          "🚀 ~ file: main.ts:56 ~ currentData ~ currentData",
+          currentData
+        );
 
         if (
-          currentData?.date &&
-          dayjs(currentData.date).add(6, "hour") < dayjs()
+          (currentData?.date &&
+            dayjs(currentData.date).add(6, "hour") < dayjs()) ||
+          !currentData
         )
           set(
             produce(({ state }: IMainStore) => {
@@ -90,7 +95,7 @@ export const useMainStore = create<IMainStore>()(
           get().state.currentDollarPrice !== 0
         ) {
           const list = [...get().state.data];
-          const lastItem = list[list.length - 1];
+          const lastItem = list[0];
           console.log("🚀 ~ file: main.ts:90 ~ getData: ~ lastItem", lastItem);
 
           const filteredList = list.filter((d) => {
@@ -160,7 +165,7 @@ async function getArabicaPrice(
         })
       );
     } catch (error) {
-      console.log("🚀 ~ file: main.ts:124 ~ error", error.response);
+      console.log("🚀 ~ file: main.ts:124 ~ error", error);
     }
   }
 }
