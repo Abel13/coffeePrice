@@ -7,6 +7,7 @@ import {
   TextInputProps,
   View,
 } from "react-native";
+import { Colors } from "../../../assets/colors";
 
 export interface InputProps extends TextInputProps {
   name: string;
@@ -19,30 +20,30 @@ export interface InputProps extends TextInputProps {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    backgroundColor: "#c9c9c9",
+    backgroundColor: Colors.input,
     borderRadius: 8,
-    borderColor: "#8a7d7d",
+    borderColor: Colors.border,
     borderWidth: 2,
     height: 50,
     width: "100%",
     alignItems: "center",
   },
   prefix: {
-    color: "#685d56",
+    color: Colors.placeholder,
     marginRight: 8,
     padding: 8,
   },
-  containerSelected: { borderBottomColor: "#926452" },
-  prefixSelected: { color: "#926452", marginRight: 8 },
+  containerSelected: { borderBottomColor: Colors.primary },
+  prefixSelected: { color: Colors.primary, marginRight: 8 },
   input: {
     flex: 1,
-    color: "#685d56",
+    color: Colors.text,
   },
   error: {
     width: "100%",
     paddingLeft: 16,
     paddingTop: 4,
-    color: "#DF7474",
+    color: Colors.danger,
   },
 });
 
@@ -90,9 +91,9 @@ const Input: React.FC<InputProps> = ({
               maxLength={18}
               style={styles.input}
               onChangeText={(text) => onChange(handleChange(text))}
-              placeholderTextColor={"#685d56"}
+              placeholderTextColor={Colors.placeholder}
               placeholder={placeholder}
-              selectionColor={"#926452"}
+              selectionColor={Colors.cursor}
               value={value}
               onFocus={() => setSelected(true)}
               onBlur={() => setSelected(false)}
@@ -110,7 +111,7 @@ const Input: React.FC<InputProps> = ({
               value={value}
               placeholder={placeholder}
               style={styles.input}
-              placeholderTextColor={"#886f5e"}
+              placeholderTextColor={Colors.placeholder}
               onFocus={() => setSelected(true)}
               onBlur={() => setSelected(false)}
             />

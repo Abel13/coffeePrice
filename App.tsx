@@ -1,8 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useState } from "react";
-import dayjs from "dayjs";
 import {
-  Alert,
   FlatList,
   RefreshControl,
   ScrollView,
@@ -16,6 +14,8 @@ import { useMainStore, IPrice } from "./src/store/main";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
+import { Colors } from "./src/assets/colors";
+import { getBrDate, getTime } from "./src/services/date";
 
 export default function App() {
   const {
@@ -31,7 +31,7 @@ export default function App() {
   } = useMainStore((store) => store);
 
   const [loading, setLoading] = useState(false);
-  const [differenceColor, setDifferenceColor] = useState("#fff");
+  const [differenceColor, setDifferenceColor] = useState(Colors.white);
   const [price, setPrice] = useState(0);
   const differencePrice = useMemo(() => {
     if (price === 0) return 0;
@@ -76,12 +76,12 @@ export default function App() {
   useEffect(() => {
     const referencePrice = currentDollarPrice * currentArabicaPrice;
 
-    if (price === 0) setDifferenceColor("#fff");
+    if (price === 0) setDifferenceColor(Colors.white);
     else if (price <= referencePrice + referencePrice * 0.12001)
-      setDifferenceColor("#a15158");
+      setDifferenceColor(Colors.defaultPrice);
     else if (price <= referencePrice + referencePrice * 0.18001)
-      setDifferenceColor("#5171A8");
-    else setDifferenceColor("#518158");
+      setDifferenceColor(Colors.goodPrice);
+    else setDifferenceColor(Colors.highPrice);
   }, [price, setDifferenceColor]);
 
   const itemRender = ({ item }) => {
@@ -90,43 +90,18 @@ export default function App() {
     const delta = mainPrice - oldPrice;
 
     return (
-      <View
-        style={{
-          borderRadius: 8,
-          width: 300,
-          margin: 5,
-          backgroundColor: "#1F232C",
-        }}
-      >
-        <View
-          style={{
-            borderTopRightRadius: 8,
-            borderTopLeftRadius: 8,
-            flexDirection: "row",
-            marginBottom: 5,
-            padding: 16,
-            backgroundColor: "#51515888",
-          }}
-        >
-          <Text>Data: </Text>
-          <Text>{dayjs(item.date).format("DD/MM/YYYY HH:mm")}</Text>
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <Text bold>Data: </Text>
+          <Text>{`${getBrDate(item.date)} - ${getTime(item.date)}`}</Text>
         </View>
 
-        <View
-          style={{
-            borderBottomWidth: 1,
-            borderBottomColor: "#51515888",
-            paddingVertical: 5,
-            paddingHorizontal: 16,
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
+        <View style={styles.cardContent}>
           <View
             style={{
               flex: 1,
               borderRightWidth: 1,
-              borderRightColor: "#51515888",
+              borderRightColor: Colors.gray,
             }}
           >
             <Text bold>Café Arábica KC</Text>
@@ -142,7 +117,7 @@ export default function App() {
           style={{
             padding: 16,
             borderBottomWidth: 1,
-            borderBottomColor: "#51515888",
+            borderBottomColor: Colors.gray,
           }}
         >
           <View style={{ margin: 5 }} />
@@ -150,14 +125,16 @@ export default function App() {
           <Text>{getCurrencyValue(mainPrice)}</Text>
           <View style={{ marginTop: 5 }}>
             <Text>Variação de preço</Text>
-            <Text danger={delta < 0}>{getCurrencyValue(delta)}</Text>
+            <Text danger={delta < 0} success={delta > 0}>
+              {getCurrencyValue(delta)}
+            </Text>
           </View>
         </View>
 
         <View>
           <View
             style={{
-              backgroundColor: "#51515888",
+              backgroundColor: Colors.gray,
               paddingHorizontal: 16,
               padding: 2,
             }}
@@ -169,7 +146,7 @@ export default function App() {
             style={{
               paddingHorizontal: 16,
               padding: 5,
-              backgroundColor: "#51815888",
+              backgroundColor: Colors.highPrice,
             }}
           >
             <Text bold>Muito Alto 18% a 25%</Text>
@@ -182,7 +159,7 @@ export default function App() {
             style={{
               paddingHorizontal: 16,
               padding: 5,
-              backgroundColor: "#5171A888",
+              backgroundColor: Colors.goodPrice,
             }}
           >
             <Text bold>Alto 12% a 18%</Text>
@@ -195,7 +172,7 @@ export default function App() {
             style={{
               paddingHorizontal: 16,
               padding: 5,
-              backgroundColor: "#a1515888",
+              backgroundColor: Colors.defaultPrice,
               borderBottomRightRadius: 8,
               borderBottomLeftRadius: 8,
             }}
@@ -222,27 +199,45 @@ export default function App() {
             <RefreshControl refreshing={loading} onRefresh={getData} />
           }
         >
-          <View style={{ alignItems: "center" }}>
+          <View style={styles.titleContainer}>
             <Text bold>CONTROLE DE PREÇOS</Text>
           </View>
-          <View style={{ margin: 10 }} />
-          <View style={{ flexDirection: "row", paddingHorizontal: 16 }}>
+          <View style={[styles.row, styles.currentDateContainer]}>
             <Text bold>Data: </Text>
-            <Text>{dayjs(currentDate).format("DD/MM/YYYY")}</Text>
+            <Text>{getBrDate(currentDate)}</Text>
           </View>
-          <View style={{ flexDirection: "row", paddingHorizontal: 16 }}>
-            <Text bold>Dolar: </Text>
-            <Text>{getCurrencyValue(currentDollarPrice)}</Text>
+          <View
+            style={[
+              styles.row,
+              {
+                marginBottom: 10,
+                borderWidth: 1,
+                borderColor: Colors.border,
+                marginHorizontal: 16,
+              },
+            ]}
+          >
+            <View
+              style={{
+                paddingHorizontal: 16,
+                flex: 1,
+                borderRightColor: Colors.border,
+                borderRightWidth: 1,
+                padding: 4,
+              }}
+            >
+              <Text bold>Dolar: </Text>
+              <Text>{getCurrencyValue(currentDollarPrice)}</Text>
+            </View>
+            <View style={{ paddingHorizontal: 16, flex: 1, padding: 4 }}>
+              <Text bold>Café Arábica KC: </Text>
+              <Text>{getCurrencyValue(currentArabicaPrice, "USD")}</Text>
+            </View>
           </View>
-          <View style={{ flexDirection: "row", paddingHorizontal: 16 }}>
-            <Text bold>Café Arábica KC: </Text>
-            <Text>{getCurrencyValue(currentArabicaPrice, "USD")}</Text>
-          </View>
-          <View style={{ margin: 5 }} />
 
           <View
             style={{
-              backgroundColor: "#514171",
+              backgroundColor: Colors.secondary,
               borderBottomColor: differenceColor,
               borderBottomWidth: 5,
               borderRadius: 8,
@@ -252,6 +247,7 @@ export default function App() {
             <View style={{ padding: 8 }}>
               <Text bold>Cotação atual</Text>
 
+              <View style={{ margin: 5 }} />
               <Input
                 type="currency"
                 control={control}
@@ -263,7 +259,7 @@ export default function App() {
             </View>
             <View
               style={{
-                borderTopColor: "#FFF",
+                borderTopColor: Colors.white,
                 borderTopWidth: 1,
                 marginTop: 10,
                 flexDirection: "row",
@@ -273,7 +269,7 @@ export default function App() {
             >
               <View
                 style={{
-                  borderRightColor: "#FFF",
+                  borderRightColor: Colors.white,
                   borderRightWidth: 1,
                   flex: 1,
                   paddingVertical: 8,
@@ -296,7 +292,7 @@ export default function App() {
             <FlatList
               data={data}
               horizontal
-              keyExtractor={(item: IPrice) => item.date}
+              keyExtractor={(item) => item.date.toString()}
               renderItem={itemRender}
             />
           </View>
@@ -309,7 +305,38 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#83746E",
+    backgroundColor: Colors.background,
     flex: 1,
+  },
+  titleContainer: { alignItems: "center", marginBottom: 10 },
+  row: { flexDirection: "row" },
+  currentDateContainer: {
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    padding: 4,
+    marginHorizontal: 16,
+  },
+  card: {
+    borderRadius: 8,
+    width: 300,
+    margin: 5,
+    backgroundColor: Colors.card,
+  },
+  cardHeader: {
+    borderTopRightRadius: 8,
+    borderTopLeftRadius: 8,
+    marginBottom: 5,
+    padding: 8,
+    paddingHorizontal: 16,
+    backgroundColor: Colors.gray,
+  },
+  cardContent: {
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.gray,
+    paddingVertical: 5,
+    paddingHorizontal: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 });
