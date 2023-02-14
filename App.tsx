@@ -97,29 +97,17 @@ export default function App() {
         </View>
 
         <View style={styles.cardContent}>
-          <View
-            style={{
-              flex: 1,
-              borderRightWidth: 1,
-              borderRightColor: Colors.gray,
-            }}
-          >
+          <View style={styles.coffeeContainer}>
             <Text bold>Café Arábica KC</Text>
             <Text>{getCurrencyValue(item.arabicaPrice, "USD")}</Text>
           </View>
-          <View style={{ flex: 1, marginLeft: 16 }}>
+          <View style={styles.dollarContainer}>
             <Text bold>Dolar</Text>
             <Text>{getCurrencyValue(item.dollarPrice)}</Text>
           </View>
         </View>
 
-        <View
-          style={{
-            padding: 16,
-            borderBottomWidth: 1,
-            borderBottomColor: Colors.gray,
-          }}
-        >
+        <View style={styles.contentContainer}>
           <View style={{ margin: 5 }} />
           <Text>Preço do café R$</Text>
           <Text>{getCurrencyValue(mainPrice)}</Text>
@@ -132,51 +120,25 @@ export default function App() {
         </View>
 
         <View>
-          <View
-            style={{
-              backgroundColor: Colors.gray,
-              paddingHorizontal: 16,
-              padding: 2,
-            }}
-          >
+          <View style={styles.benefit}>
             <Text bold>Diferencial (Bebida Dura)</Text>
           </View>
 
-          <View
-            style={{
-              paddingHorizontal: 16,
-              padding: 5,
-              backgroundColor: Colors.highPrice,
-            }}
-          >
+          <View style={styles.highPrice}>
             <Text bold>Muito Alto 18% a 25%</Text>
             <Text>{`${getCurrencyValue(
               mainPrice * 0.18001 + mainPrice
             )} a ${getCurrencyValue(mainPrice * 0.25 + mainPrice)}`}</Text>
           </View>
 
-          <View
-            style={{
-              paddingHorizontal: 16,
-              padding: 5,
-              backgroundColor: Colors.goodPrice,
-            }}
-          >
+          <View style={styles.goodPrice}>
             <Text bold>Alto 12% a 18%</Text>
             <Text>{`${getCurrencyValue(
               mainPrice * 0.12001 + mainPrice
             )} a ${getCurrencyValue(mainPrice * 0.18 + mainPrice)}`}</Text>
           </View>
 
-          <View
-            style={{
-              paddingHorizontal: 16,
-              padding: 5,
-              backgroundColor: Colors.defaultPrice,
-              borderBottomRightRadius: 8,
-              borderBottomLeftRadius: 8,
-            }}
-          >
+          <View style={styles.defaultPrice}>
             <Text bold>Padrão 5% a 12%</Text>
             <Text>{`${getCurrencyValue(
               mainPrice * 0.05 + mainPrice
@@ -206,43 +168,19 @@ export default function App() {
             <Text bold>Data: </Text>
             <Text>{getBrDate(currentDate)}</Text>
           </View>
-          <View
-            style={[
-              styles.row,
-              {
-                marginBottom: 10,
-                borderWidth: 1,
-                borderColor: Colors.border,
-                marginHorizontal: 16,
-              },
-            ]}
-          >
-            <View
-              style={{
-                paddingHorizontal: 16,
-                flex: 1,
-                borderRightColor: Colors.border,
-                borderRightWidth: 1,
-                padding: 4,
-              }}
-            >
-              <Text bold>Dolar: </Text>
-              <Text>{getCurrencyValue(currentDollarPrice)}</Text>
-            </View>
-            <View style={{ paddingHorizontal: 16, flex: 1, padding: 4 }}>
+          <View style={[styles.row, styles.currentPriceContainer]}>
+            <View style={styles.currentArabicaContent}>
               <Text bold>Café Arábica KC: </Text>
               <Text>{getCurrencyValue(currentArabicaPrice, "USD")}</Text>
+            </View>
+            <View style={styles.currentDollarContent}>
+              <Text bold>Dolar: </Text>
+              <Text>{getCurrencyValue(currentDollarPrice)}</Text>
             </View>
           </View>
 
           <View
-            style={{
-              backgroundColor: Colors.secondary,
-              borderBottomColor: differenceColor,
-              borderBottomWidth: 5,
-              borderRadius: 8,
-              marginHorizontal: 16,
-            }}
+            style={[{ borderBottomColor: differenceColor }, styles.inputCard]}
           >
             <View style={{ padding: 8 }}>
               <Text bold>Cotação atual</Text>
@@ -257,30 +195,12 @@ export default function App() {
                 onEndEditing={handleSubmit(onSubmit)}
               />
             </View>
-            <View
-              style={{
-                borderTopColor: Colors.white,
-                borderTopWidth: 1,
-                marginTop: 10,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                paddingHorizontal: 8,
-              }}
-            >
-              <View
-                style={{
-                  borderRightColor: Colors.white,
-                  borderRightWidth: 1,
-                  flex: 1,
-                  paddingVertical: 8,
-                }}
-              >
+            <View style={styles.differenceContainer}>
+              <View style={styles.reaisDifferenceContainer}>
                 <Text bold>Diferença R$</Text>
                 <Text>{getCurrencyValue(differencePrice)}</Text>
               </View>
-              <View
-                style={{ flex: 1, alignItems: "flex-end", paddingVertical: 8 }}
-              >
+              <View style={styles.percentDifferenceContainer}>
                 <Text bold>Diferença %</Text>
                 <Text>{`${differencePercent}%`}</Text>
               </View>
@@ -338,5 +258,81 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  coffeeContainer: {
+    flex: 1,
+    borderRightWidth: 1,
+    borderRightColor: Colors.gray,
+  },
+  dollarContainer: { flex: 1, marginLeft: 16 },
+  contentContainer: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.gray,
+  },
+  benefit: {
+    backgroundColor: Colors.gray,
+    paddingHorizontal: 16,
+    padding: 2,
+  },
+  highPrice: {
+    paddingHorizontal: 16,
+    padding: 5,
+    backgroundColor: Colors.highPrice,
+  },
+  goodPrice: {
+    paddingHorizontal: 16,
+    padding: 5,
+    backgroundColor: Colors.goodPrice,
+  },
+  defaultPrice: {
+    paddingHorizontal: 16,
+    padding: 5,
+    backgroundColor: Colors.defaultPrice,
+    borderBottomRightRadius: 8,
+    borderBottomLeftRadius: 8,
+  },
+  currentPriceContainer: {
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginHorizontal: 16,
+  },
+  currentArabicaContent: {
+    paddingHorizontal: 16,
+    flex: 1,
+    padding: 4,
+    borderRightColor: Colors.border,
+    borderRightWidth: 1,
+  },
+  currentDollarContent: {
+    paddingHorizontal: 16,
+    flex: 1,
+    padding: 4,
+  },
+  inputCard: {
+    backgroundColor: Colors.secondary,
+    borderBottomWidth: 5,
+    borderRadius: 8,
+    marginHorizontal: 16,
+  },
+  differenceContainer: {
+    borderTopColor: Colors.white,
+    borderTopWidth: 1,
+    marginTop: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 8,
+  },
+  reaisDifferenceContainer: {
+    borderRightColor: Colors.white,
+    borderRightWidth: 1,
+    flex: 1,
+    paddingVertical: 8,
+  },
+  percentDifferenceContainer: {
+    flex: 1,
+    alignItems: "flex-end",
+    paddingVertical: 8,
   },
 });

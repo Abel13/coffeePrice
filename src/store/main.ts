@@ -53,10 +53,6 @@ export const useMainStore = create<IMainStore>()(
             dayjs(d.date).format("YYYY/MM/DD") === dayjs().format("YYYY/MM/DD")
           );
         });
-        console.log(
-          "🚀 ~ file: main.ts:56 ~ currentData ~ currentData",
-          currentData
-        );
 
         if (
           (currentData?.date &&
@@ -72,23 +68,14 @@ export const useMainStore = create<IMainStore>()(
           );
       },
       getData: async () => {
-        console.log(
-          "🚀 ~ file: main.ts:77 ~ getData: ~ get().state.dataLoaded",
-          get().state.dataLoaded
-        );
+        const dayOfWeek = dayjs().day();
+
         if (get().state.dataLoaded) return;
+        if (dayOfWeek === 0 || dayOfWeek === 6) return;
 
         await getDollar(get, set);
-        console.log(
-          "🚀 ~ file: main.ts:81 ~ getData: ~ getDollar",
-          get().state.currentDollarPrice
-        );
 
         await getArabicaPrice(get, set);
-        console.log(
-          "🚀 ~ file: main.ts:85 ~ getData: ~ getArabicaPrice",
-          get().state.currentArabicaPrice
-        );
 
         if (
           get().state.currentArabicaPrice !== 0 &&
@@ -96,7 +83,6 @@ export const useMainStore = create<IMainStore>()(
         ) {
           const list = [...get().state.data];
           const lastItem = list[0];
-          console.log("🚀 ~ file: main.ts:90 ~ getData: ~ lastItem", lastItem);
 
           const filteredList = list.filter((d) => {
             return (
