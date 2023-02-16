@@ -17,13 +17,18 @@ interface IMainState {
   currentDollarPrice: number;
   currentArabicaPrice: number;
   currentDate: Date;
-  dataLoaded: boolean;
+  dataLoaded?: boolean;
   data: IPrice[];
 }
 
 interface IMainStore {
   state: IMainState;
   getData: () => Promise<void>;
+  /**
+   * This function is responsible to reset the current data to load new ones,
+   * if {@link state.dataLoaded} is false then the useEffect will getData.
+   * @returns void
+   */
   resetCurrentData: () => void;
 }
 
@@ -39,7 +44,6 @@ const initialState: IMainState = {
   currentDollarPrice: 0,
   currentArabicaPrice: 0,
   currentDate: dayjs().toDate(),
-  dataLoaded: true,
   data: [],
 };
 
@@ -59,7 +63,7 @@ export const useMainStore = create<IMainStore>()(
 
         if (
           (currentData?.date &&
-            dayjs(currentData.date).add(6, "hour") < dayjs()) ||
+            dayjs(currentData.date).add(12, "hour") < dayjs()) ||
           !currentData
         )
           set(
@@ -82,7 +86,6 @@ export const useMainStore = create<IMainStore>()(
           get().state.currentDollarPrice !== 0
         ) {
           const list = [...get().state.data];
-          const lastItem = list[0];
 
           const filteredList = list.filter((d) => {
             return (
@@ -90,6 +93,7 @@ export const useMainStore = create<IMainStore>()(
               dayjs().format("YYYY/MM/DD")
             );
           });
+          const lastItem = filteredList[0];
 
           const oldPrice = lastItem
             ? lastItem.dollarPrice * lastItem.arabicaPrice
@@ -139,12 +143,10 @@ async function getArabicaPrice(
       const { data } = await apiArabica.get(
         "/commodities/us-coffee-c?utm_source=investing_app&utm_medium=share_link&utm_campaign=share_instrument"
       );
-
       const index = data.indexOf(`data-test="instrument-price-last"`);
       const rest = data.substring(index + 34);
       const indexSpan = rest.indexOf("</span>");
       const price = rest.substring(0, indexSpan);
-
       set(
         produce(({ state }: IMainStore) => {
           state.currentArabicaPrice = Number(price.replace(",", "."));
