@@ -48,6 +48,9 @@ export const useMainStore = create<IMainStore>()(
     (set, get) => ({
       state: initialState,
       resetCurrentData: () => {
+        const dayOfWeek = dayjs().day();
+        if (dayOfWeek === 0 || dayOfWeek === 6) return;
+
         const currentData = get().state.data.find((d) => {
           return (
             dayjs(d.date).format("YYYY/MM/DD") === dayjs().format("YYYY/MM/DD")
@@ -68,10 +71,7 @@ export const useMainStore = create<IMainStore>()(
           );
       },
       getData: async () => {
-        const dayOfWeek = dayjs().day();
-
         if (get().state.dataLoaded) return;
-        if (dayOfWeek === 0 || dayOfWeek === 6) return;
 
         await getDollar(get, set);
 
