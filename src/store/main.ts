@@ -63,7 +63,7 @@ export const useMainStore = create<IMainStore>()(
 
         if (
           (currentData?.date &&
-            dayjs(currentData.date).add(12, "hour") < dayjs()) ||
+            dayjs(currentData.date).add(11, "hours") < dayjs()) ||
           !currentData
         )
           set(
@@ -138,15 +138,19 @@ async function getArabicaPrice(
     replace?: boolean | undefined
   ) => void
 ) {
+  console.log("entrou");
   if (get().state.currentArabicaPrice === 0 && !get().state.dataLoaded) {
+    console.log("comparou");
     try {
       const { data } = await apiArabica.get(
         "/commodities/us-coffee-c?utm_source=investing_app&utm_medium=share_link&utm_campaign=share_instrument"
       );
+      console.log("buscou");
       const index = data.indexOf(`data-test="instrument-price-last"`);
       const rest = data.substring(index + 34);
       const indexSpan = rest.indexOf("</span>");
       const price = rest.substring(0, indexSpan);
+      console.log("price", price);
       set(
         produce(({ state }: IMainStore) => {
           state.currentArabicaPrice = Number(price.replace(",", "."));

@@ -50,6 +50,13 @@ export default function App() {
     if (dataLoaded === false) fetchData();
   }, [dataLoaded]);
 
+  useEffect(() => {
+    console.log("====================================");
+    console.log("ARABICA", currentArabicaPrice);
+    console.log("DOLLAR", currentDollarPrice);
+    console.log("====================================");
+  }, [currentArabicaPrice, currentDollarPrice]);
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
